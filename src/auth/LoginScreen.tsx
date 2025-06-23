@@ -9,12 +9,14 @@ import {
 
 interface LoginScreenProps {
     onLogin: (email: string, password: string) => void;
+    onEmailLoginPress: () => void;
+    onPhoneLoginPress: () => void;
 }
 
-export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
+export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onEmailLoginPress, onPhoneLoginPress }) => {
     const handleEmailLogin = () => {
-        // Handle email login directly here
-        onLogin('example@email.com', 'password');
+        // Navigate to email login screen
+        onEmailLoginPress();
     };
 
     const handleGoogleLogin = () => {
@@ -26,7 +28,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
     };
 
     const handlePhoneLogin = () => {
-        // Handle phone login
+        // Navigate to phone login screen
+        onPhoneLoginPress();
     };
 
     return (
