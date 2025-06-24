@@ -18,8 +18,8 @@ export const ItemCard: React.FC<ItemCardProps> = ({
 }) => {
   return (
     <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.8}>
-      {image ? (
-        <Image source={image} style={styles.image} />
+      {image && image.uri ? (
+        <Image source={{ uri: image.uri }} style={styles.image} />
       ) : (
         <View style={styles.imagePlaceholder} />
       )}

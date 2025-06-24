@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
+import { Asset } from 'react-native-image-picker';
 
 const { width } = Dimensions.get('window');
 
@@ -18,6 +19,7 @@ interface ItemDetailScreenProps {
   route: {
     params: {
       item: {
+        id: string;
         image?: any;
         title: string;
         price: string;
@@ -27,18 +29,20 @@ interface ItemDetailScreenProps {
           name: string;
           avatar?: any;
         };
+        images?: Asset[];
       };
     };
   };
   navigation: any;
+  onDelete?: (adId: string) => void;
 }
 
-export const ItemDetailScreen: React.FC<ItemDetailScreenProps> = ({ route, navigation }) => {
+export const ItemDetailScreen: React.FC<ItemDetailScreenProps> = ({ route, navigation, onDelete }) => {
   const { item } = route.params;
 
   // Placeholder data if not passed
   const displayItem = {
-    image: item.image,
+    images: item.images || [],
     title: item.title || 'Item Title',
     price: item.price || '$0',
     location: item.location || 'Unknown Location',
@@ -58,8 +62,12 @@ export const ItemDetailScreen: React.FC<ItemDetailScreenProps> = ({ route, navig
           <View style={{ width: 40 }} />
         </View>
 
-        {displayItem.image ? (
-          <Image source={displayItem.image} style={styles.image} />
+        {displayItem.images.length > 0 ? (
+          <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}>
+            {displayItem.images.map((img, index) => (
+              <Image key={index} source={{ uri: img.uri }} style={styles.image} />
+            ))}
+          </ScrollView>
         ) : (
           <View style={styles.imagePlaceholder} />
         )}
@@ -85,7 +93,7 @@ export const ItemDetailScreen: React.FC<ItemDetailScreenProps> = ({ route, navig
             )}
             <View>
               <Text style={styles.sellerName}>{displayItem.seller.name}</Text>
-              <Text style={styles.sellerInfo}>Member since 2023</Text>
+              {/* <Text style={styles.sellerInfo}>Member since 2023</Text> */}
             </View>
           </View>
         </View>
@@ -99,6 +107,11 @@ export const ItemDetailScreen: React.FC<ItemDetailScreenProps> = ({ route, navig
           <Text style={styles.footerButtonText}>Call</Text>
         </TouchableOpacity>
       </View>
+      {onDelete && (
+        <TouchableOpacity style={styles.deleteButton} onPress={() => onDelete(item.id)}>
+          <Text style={styles.deleteButtonText}>Delete Ad</Text>
+        </TouchableOpacity>
+      )}
     </SafeAreaView>
   );
 };
@@ -113,8 +126,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 15,
+    paddingTop: 50,
     borderBottomWidth: 1,
-    marginTop: 30,
     borderBottomColor: '#eee',
   },
   backButton: {
@@ -207,8 +220,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#eee',
     padding: 10,
-    marginBottom: 50,
-
+    paddingBottom: 50,
   },
   footerButton: {
     flex: 1,
@@ -228,6 +240,18 @@ const styles = StyleSheet.create({
   footerButtonText: {
     color: 'white',
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  deleteButton: {
+    backgroundColor: '#FF3B30',
+    padding: 15,
+    margin: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  deleteButtonText: {
+    color: 'white',
+    fontSize: 18,
     fontWeight: 'bold',
   },
 }); 

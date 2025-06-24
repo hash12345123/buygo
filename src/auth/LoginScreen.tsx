@@ -94,14 +94,15 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'white',
         padding: 20,
+        paddingTop: 50,
     },
     logoContainer: {
         alignItems: 'center',
-        marginTop: 60,
+        marginTop: 40,
         marginBottom: 40,
     },
     logo: {
-        marginTop: 50,
+        marginTop: 30,
         alignSelf: 'center',
         width: 130,
         height: 130,

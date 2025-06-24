@@ -239,12 +239,14 @@ const styles = StyleSheet.create({
   headerContainer: {
     backgroundColor: 'rgb(255, 255, 255)',
     paddingVertical: 10,
+    paddingTop: 50,
+    paddingBottom: 10,
   },
   headerCards: {
     flexDirection: 'row',
     justifyContent: 'center',
     paddingHorizontal: 15,
-    marginTop: 50,
+    marginTop: 20,
   },
   scrollView: {
     flex: 1,
@@ -342,8 +344,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderTopWidth: 1,
     borderTopColor: '#E0E0E0',
-    paddingVertical: 5,
-    marginBottom: 50,
+    paddingVertical: 10,
+    paddingBottom: 50,
     paddingHorizontal: 10,
     justifyContent: 'space-around',
     alignItems: 'center',

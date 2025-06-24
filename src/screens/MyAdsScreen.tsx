@@ -33,6 +33,7 @@ export const MyAdsScreen: React.FC<MyAdsScreenProps> = ({
   const renderItem = ({ item }: { item: Ad }) => (
     <View style={styles.cardContainer}>
       <ItemCard
+        image={item.images && item.images.length > 0 ? item.images[0] : null}
         title={item.title}
         price={item.price}
         location={item.location || "Unknown Location"}
@@ -79,12 +80,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 15,
+    paddingTop: 50,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     backgroundColor: 'white',
   },
   backButton: {
     padding: 5,
+    marginTop: 20,
   },
   backButtonText: {
     fontSize: 30,
@@ -95,6 +98,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     flex: 1,
+    marginTop: 20,
     textAlign: 'center',
     marginHorizontal: 10,
   },
@@ -117,12 +121,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   listContainer: {
-    paddingHorizontal: 10,
-    paddingTop: 20,
+    paddingHorizontal: 8,
+    paddingTop: 16,
   },
   cardContainer: {
-    flex: 1 / 2,
-    alignItems: 'center',
-    marginBottom: 20,
+    flex: 0.5,
+    paddingHorizontal: 8,
+    marginBottom: 16,
   },
 }); 

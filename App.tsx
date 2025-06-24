@@ -16,6 +16,7 @@ import { ItemDetailScreen } from './src/screens/ItemDetailScreen';
 import { SelectCategoryScreen } from './src/screens/SelectCategoryScreen';
 import { CreateAdScreen } from './src/screens/CreateAdScreen';
 import { MyAdsScreen } from './src/screens/MyAdsScreen';
+import { AccountScreen } from './src/screens/AccountScreen';
 
 type Screen = 'Login' | 'EmailLogin' | 'PhoneLogin' | 'ForgotPassword';
 type SellScreen = 'SelectCategory' | 'CreateAd';
@@ -32,6 +33,7 @@ const App: React.FC = () => {
   const [userAds, setUserAds] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<AuthenticatedScreen>('Home');
 
+  //back handler hook
   useEffect(() => {
     const backAction = () => {
       if (sellFlowScreen === 'CreateAd') {
@@ -61,11 +63,13 @@ const App: React.FC = () => {
     return () => backHandler.remove();
   }, [selectedItem, sellFlowScreen, activeTab]);
 
+
+  //auth handlers
   const handleLogin = (email: string, password: string) => {
     // Simulate successful login
     setUserInfo({ email });
     setIsAuthenticated(true);
-    Alert.alert('Success', 'Login successful!');
+    // Alert.alert('Success', 'Login successful!');
   };
 
   const handlePhoneLogin = (phone: string, code: string) => {
@@ -86,8 +90,8 @@ const App: React.FC = () => {
     Alert.alert('Logged Out', 'You have been successfully logged out.');
   };
 
-  const handleSelectItem = (item: any) => {
-    setSelectedItem(item);
+  const handleSelectItem = (item: any, isMyAd: boolean = false) => {
+    setSelectedItem({ ...item, isMyAd });
   };
 
   const handleBack = () => {
@@ -116,78 +120,100 @@ const App: React.FC = () => {
     Alert.alert('Success', 'Your ad has been submitted!');
   };
 
+  const handleDeleteAd = (adId: string) => {
+    setUserAds(prevAds => prevAds.filter(ad => ad.id !== adId));
+    setSelectedItem(null);
+    Alert.alert('Deleted', 'Your ad has been successfully deleted.');
+  };
+
   const navigateTo = (screen: Screen) => {
     setCurrentScreen(screen);
   };
 
-  if (isAuthenticated) {
-    if (sellFlowScreen === 'SelectCategory') {
-      return <SelectCategoryScreen onSelectCategory={handleSelectCategory} onNavigateBack={() => setSellFlowScreen(null)} />;
+  const renderContent = () => {
+    if (isAuthenticated) {
+      if (sellFlowScreen === 'SelectCategory') {
+        return <SelectCategoryScreen onSelectCategory={handleSelectCategory} onNavigateBack={() => setSellFlowScreen(null)} />;
+      }
+    
+      if (sellFlowScreen === 'CreateAd' && selectedCategory) {
+        return <CreateAdScreen category={selectedCategory} onNavigateBack={() => setSellFlowScreen('SelectCategory')} onSubmit={handleAdSubmit} />;
+      }
+    
+      if (selectedItem) {
+        return (
+          <ItemDetailScreen
+            route={{ params: { item: selectedItem } }}
+            navigation={{ goBack: handleBack }}
+            onDelete={selectedItem.isMyAd ? handleDeleteAd : undefined}
+          />
+        );
+      }
+    
+      switch (activeTab) {
+        case 'Home':
+          return <HomeScreen onSelectItem={(item) => handleSelectItem(item, false)} onSellPress={handleSellPress} onNavigateTab={setActiveTab} />;
+        case 'MyAds':
+          return <MyAdsScreen ads={userAds} onNavigateBack={() => setActiveTab('Home')} onSelectItem={(item) => handleSelectItem(item, true)} />;
+        case 'Account':
+          return <AccountScreen userInfo={userInfo} onLogout={handleLogout} onNavigateTab={setActiveTab} onSellPress={handleSellPress} />;
+        default:
+          return <HomeScreen onSelectItem={(item) => handleSelectItem(item, false)} onSellPress={handleSellPress} onNavigateTab={setActiveTab} />;
+      }
     }
-  
-    if (sellFlowScreen === 'CreateAd' && selectedCategory) {
-      return <CreateAdScreen category={selectedCategory} onNavigateBack={() => setSellFlowScreen('SelectCategory')} onSubmit={handleAdSubmit} />;
-    }
-  
-    if (selectedItem) {
-      return (
-        <ItemDetailScreen
-          route={{ params: { item: selectedItem } }}
-          navigation={{ goBack: handleBack }}
-        />
-      );
-    }
-  
-    switch (activeTab) {
-      case 'Home':
-        return <HomeScreen onSelectItem={handleSelectItem} onSellPress={handleSellPress} onNavigateTab={setActiveTab} />;
-      case 'MyAds':
-        return <MyAdsScreen ads={userAds} onNavigateBack={() => setActiveTab('Home')} onSelectItem={handleSelectItem} />;
-      default:
-        return <HomeScreen onSelectItem={handleSelectItem} onSellPress={handleSellPress} onNavigateTab={setActiveTab} />;
-    }
-  }
 
-  switch (currentScreen) {
-    case 'Login':
-      return (
-        <LoginScreen
-          onLogin={handleLogin}
-          onEmailLoginPress={() => navigateTo('EmailLogin')}
-          onPhoneLoginPress={() => navigateTo('PhoneLogin')}
-        />
-      );
-    case 'EmailLogin':
-      return (
-        <EmailLoginScreen
-          onLogin={handleLogin}
-          onBack={() => navigateTo('Login')}
-          onForgotPassword={() => navigateTo('ForgotPassword')}
-        />
-      );
-    case 'PhoneLogin':
-      return (
-        <PhoneLoginScreen
-          onLogin={handlePhoneLogin}
-          onBack={() => navigateTo('Login')}
-        />
-      );
-    case 'ForgotPassword':
-      return (
-        <ForgotPasswordScreen
-          onBack={() => navigateTo('EmailLogin')}
-          onResetSent={handleResetSent}
-        />
-      );
-    default:
-      return (
-        <LoginScreen
-          onLogin={handleLogin}
-          onEmailLoginPress={() => navigateTo('EmailLogin')}
-          onPhoneLoginPress={() => navigateTo('PhoneLogin')}
-        />
-      );
-  }
+    switch (currentScreen) {
+      case 'Login':
+        return (
+          <LoginScreen
+            onLogin={handleLogin}
+            onEmailLoginPress={() => navigateTo('EmailLogin')}
+            onPhoneLoginPress={() => navigateTo('PhoneLogin')}
+          />
+        );
+      case 'EmailLogin':
+        return (
+          <EmailLoginScreen
+            onLogin={handleLogin}
+            onBack={() => navigateTo('Login')}
+            onForgotPassword={() => navigateTo('ForgotPassword')}
+          />
+        );
+      case 'PhoneLogin':
+        return (
+          <PhoneLoginScreen
+            onLogin={handlePhoneLogin}
+            onBack={() => navigateTo('Login')}
+          />
+        );
+      case 'ForgotPassword':
+        return (
+          <ForgotPasswordScreen
+            onBack={() => navigateTo('EmailLogin')}
+            onResetSent={handleResetSent}
+          />
+        );
+      default:
+        return (
+          <LoginScreen
+            onLogin={handleLogin}
+            onEmailLoginPress={() => navigateTo('EmailLogin')}
+            onPhoneLoginPress={() => navigateTo('PhoneLogin')}
+          />
+        );
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <StatusBar
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        backgroundColor="transparent"
+        translucent={true}
+      />
+      {renderContent()}
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
